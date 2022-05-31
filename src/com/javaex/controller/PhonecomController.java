@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.javaex.dao.PhoneDao;
+import com.javaex.util.WebUtil;
 import com.javaex.vo.PersonVo;
 
 @WebServlet("/pbc")
@@ -44,6 +45,9 @@ public class PhonecomController extends HttpServlet {
 			System.out.println("personList");
 			
 			request.setAttribute("pList", personList);
+			
+			WebUtil webUtil = new WebUtil();
+			webUtil.forward(request, response, "/list.jsp");
 			
 			//데이터 + html --> jsp 시킨다
 			RequestDispatcher rd = request.getRequestDispatcher("/list.jsp");
@@ -93,11 +97,21 @@ public class PhonecomController extends HttpServlet {
 			PersonVo personVo = new PersonVo(personid, name, hp, company);
 			
 			PhoneDao phoneDao = new PhoneDao();
-			int update = phoneDao.personUpdate(personVo);
+			int count = phoneDao.personUpdate(personVo);
 			
+			//리다이렉트 리스트
+			response.sendRedirect("/phonebook2/pbc?action=list");
 			
+		} else if("updateForm".equals(action)) {
 			
-		} else {
+			PhoneDao phoneDao = new PhoneDao();
+			List<PersonVo> phoneList = phoneDao.getPersonList();
+			request.setAttribute("pList", phoneList);
+			
+			RequestDispatcher rd = request.getRequestDispatcher("/updateForm.jsp");
+			rd.forward(request, response);
+			
+		} else{
 			System.out.println("action 파라미터 없음");
 		}
 		
